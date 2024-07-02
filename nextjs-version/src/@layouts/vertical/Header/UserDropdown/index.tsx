@@ -1,29 +1,16 @@
 import { Avatar, Dropdown, MenuProps } from "antd";
-import {
-  UserOutlined,
-  DownOutlined,
-  LogoutOutlined,
-  LockOutlined,
-} from "@ant-design/icons";
+import { UserOutlined, DownOutlined, LogoutOutlined } from "@ant-design/icons";
+import ChangePassword from "./ChangePassword";
+import LogOut from "./LogOut";
 
 const UserDropdown = () => {
   const items: MenuProps["items"] = [
     {
-      label: (
-        <div className="flex gap-2">
-          <LockOutlined />
-          <span>Change Password</span>
-        </div>
-      ),
+      label: <ChangePassword />,
       key: "0",
     },
     {
-      label: (
-        <div className="flex gap-2 text-red-600">
-          <LogoutOutlined />
-          <span>Log Out</span>
-        </div>
-      ),
+      label: <LogOut />,
       key: "1",
     },
   ];

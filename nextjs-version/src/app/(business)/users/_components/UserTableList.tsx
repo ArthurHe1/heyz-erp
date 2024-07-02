@@ -1,93 +1,110 @@
 "use client";
 
-import { Space, Table, TableProps, Tag } from "antd";
 import { useEffect, useState } from "react";
+import { Divider, Space, Table, TableProps, Tag } from "antd";
+import {
+  DeleteOutlined,
+  FormOutlined,
+  PartitionOutlined,
+  SafetyOutlined,
+} from "@ant-design/icons";
+import customClientFetch from "@/utils/customFetch";
+import AddUser from "./AddUser";
 
 interface DataType {
-  key: string;
-  name: string;
-  age: number;
+  firstName: string;
+  lastName: string;
+  account: number;
   address: string;
   tags: string[];
 }
 
-const dataSource: DataType[] = [
-  {
-    key: "1",
-    name: "John Brown",
-    age: 32,
-    address: "New York No. 1 Lake Park",
-    tags: ["nice", "developer"],
-  },
-  {
-    key: "2",
-    name: "Jim Green",
-    age: 42,
-    address: "London No. 1 Lake Park",
-    tags: ["loser"],
-  },
-  {
-    key: "3",
-    name: "Joe Black",
-    age: 32,
-    address: "Sydney No. 1 Lake Park",
-    tags: ["cool", "teacher"],
-  },
-];
-
 const UserTableList = () => {
   const [data, setData] = useState<DataType[]>([]);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    setTimeout(() => {
-      setData(dataSource);
-    }, 1000);
+    getUsers();
   }, []);
+
+  const getUsers = async () => {
+    setLoading(true);
+    const result = await customClientFetch("/user/list", {
+      method: "GET",
+      params: { page: 1, pageSize: 20 },
+    });
+    setData(result?.data?.items || []);
+    setLoading(false);
+  };
 
   const columns: TableProps<DataType>["columns"] = [
     {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
-      render: (text) => <a>{text}</a>,
+      title: "FullName",
+      dataIndex: "fullName",
+      key: "fullName",
     },
     {
-      title: "Age",
-      dataIndex: "age",
-      key: "age",
-    },
-    {
-      title: "Address",
-      dataIndex: "address",
-      key: "address",
-    },
-    {
-      title: "Tags",
-      key: "tags",
-      dataIndex: "tags",
-      render: (_, { tags }) => (
-        <>
-          {tags.map((tag) => {
-            let color = tag.length > 5 ? "geekblue" : "green";
-            if (tag === "loser") {
-              color = "volcano";
-            }
-            return (
-              <Tag color={color} key={tag}>
-                {tag.toUpperCase()}
-              </Tag>
-            );
-          })}
-        </>
+      title: "Account",
+      dataIndex: "account",
+      key: "account",
+      render: (text) => (
+        <>{text || <span className="text-gray-300">---</span>}</>
       ),
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (text) => {
+        const status = text || "Disable";
+        return (
+          <Tag color={status === "Enable" ? "success" : "default"}>
+            {status}
+          </Tag>
+        );
+      },
+    },
+    {
+      title: "Role",
+      dataIndex: "roles",
+      key: "roles",
+      render: (text) => {
+        if (text) {
+          return text.split(",").map((role: string) => (
+            <Tag key={role} color="processing">
+              {role}
+            </Tag>
+          ));
+        }
+        return <span className="text-gray-300">---</span>;
+      },
     },
     {
       title: "Action",
       key: "action",
+      width: 500,
       render: (_, record) => (
-        <Space size="middle">
-          <a>Invite {record.name}</a>
-          <a>Delete</a>
+        <Space size="small" split={<Divider type="vertical" />}>
+          <span
+            className={`${
+              record.account ? "text-gray-300" : "text-blue-500"
+            } flex gap-1 cursor-pointer`}
+          >
+            <SafetyOutlined />
+            <span>Generate Account</span>
+          </span>
+          <span className="text-blue-500 flex gap-1 cursor-pointer">
+            <PartitionOutlined />
+            <span>Assign Roles</span>
+          </span>
+          <span className="text-blue-500 flex gap-1 cursor-pointer">
+            <FormOutlined />
+            <span>Edit</span>
+          </span>
+          <span className="text-red-500 flex gap-1 cursor-pointer">
+            <DeleteOutlined />
+            <span>Delete</span>
+          </span>
         </Space>
       ),
     },
@@ -95,8 +112,15 @@ const UserTableList = () => {
 
   return (
     <>
+      <AddUser refresh={getUsers} />
       <div className="pt-4">
-        <Table size="small" bordered columns={columns} dataSource={data} />
+        <Table
+          size="small"
+          bordered
+          columns={columns}
+          dataSource={data}
+          loading={loading}
+        />
       </div>
     </>
   );

@@ -26,7 +26,7 @@ const LanguageDropdown = () => {
   return (
     <>
       <Dropdown placement="bottom" menu={{ items }}>
-        <div className="text-xl cursor-pointer">
+        <div className="text-xl cursor-pointer text-slate-400">
           <TranslationOutlined />
         </div>
       </Dropdown>

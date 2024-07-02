@@ -1,59 +1,41 @@
 "use client";
 
 import { useState } from "react";
-import { Menu, MenuProps } from "antd";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { Menu } from "antd";
 import {
-  AppstoreOutlined,
-  ContainerOutlined,
-  DesktopOutlined,
-  MailOutlined,
-  PieChartOutlined,
+  ProductOutlined,
   LeftOutlined,
   RightOutlined,
 } from "@ant-design/icons";
-import Image from "next/image";
 
-type MenuItem = Required<MenuProps>["items"][number];
-
-const items: MenuItem[] = [
-  { key: "1", icon: <PieChartOutlined />, label: "Option 1" },
-  { key: "2", icon: <DesktopOutlined />, label: "Option 2" },
-  { key: "3", icon: <ContainerOutlined />, label: "Option 3" },
+const items: any[] = [
   {
-    key: "sub1",
-    label: "Navigation One",
-    icon: <MailOutlined />,
+    key: "system",
+    label: "System Management",
+    icon: <ProductOutlined />,
     children: [
-      { key: "5", label: "Option 5" },
-      { key: "6", label: "Option 6" },
-      { key: "7", label: "Option 7" },
-      { key: "8", label: "Option 8" },
-    ],
-  },
-  {
-    key: "sub2",
-    label: "Navigation Two",
-    icon: <AppstoreOutlined />,
-    children: [
-      { key: "9", label: "Option 9" },
-      { key: "10", label: "Option 10" },
-      {
-        key: "sub3",
-        label: "Submenu",
-        children: [
-          { key: "11", label: "Option 11" },
-          { key: "12", label: "Option 12" },
-        ],
-      },
+      { key: "users", label: "Users Management", path: "/users" },
+      { key: "roles", label: "Roles Management", path: "/roles" },
     ],
   },
 ];
 
 const NavBar = () => {
+  const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
 
   const toggleCollapsed = () => {
     setCollapsed(!collapsed);
+  };
+
+  const onMenuClick = (item: any) => {
+    const _path = item?.item?.props?.path;
+    console.log("item: ", _path);
+    if (typeof _path !== "undefined") {
+      router.push(_path);
+    }
   };
 
   return (
@@ -66,12 +48,13 @@ const NavBar = () => {
           )}
         </div>
         <Menu
-          defaultSelectedKeys={["1"]}
-          defaultOpenKeys={["sub1"]}
+          defaultSelectedKeys={["users"]}
+          defaultOpenKeys={["system"]}
           mode="inline"
           theme="dark"
           inlineCollapsed={collapsed}
           items={items}
+          onClick={onMenuClick}
         />
         <div
           className="rounded-full bg-white shadow-md shadow-blue-500/50 w-[32px] h-[32px] border-gray-200 border-[1px] flex items-center justify-center text-xs cursor-pointer text-black absolute top-1/2 right-[-16px]"
